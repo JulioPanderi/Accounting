@@ -1,8 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-
-namespace Accounting.Domain.DTO
+﻿namespace Accounting.Domain.DTO
 {
     public class CompanyDTO
     {

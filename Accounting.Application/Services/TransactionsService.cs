@@ -3,16 +3,15 @@ using Accounting.Domain.Filters;
 using Accounting.Infrastructure.Filters;
 using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
-using Accounting.Infrastructure.Repository;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Accounting.Application.Services
 {
+    /// <summary>
+    /// Service class for the Transactions. Every document generated, should use this class as main, and then write their corresponding children
+    /// </summary>
+    /// <remarks>
+    /// Transactions records are not allowed to be modified or deleted. To modified or delete a transaction, a new one should be created and mark the previous one as deleted or modified. Also an auditory record sholud be generated
+    /// </remarks>
     internal class TransactionsService
     {
         private readonly ITransactionsRepository transactionsRepository;

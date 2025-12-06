@@ -1,11 +1,8 @@
-﻿using Accounting.Application.Interfaces;
-using Accounting.Domain.DTO;
+﻿using Accounting.Domain.DTO;
 using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
-using Accounting.Infrastructure.Repository;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.ComponentModel.DataAnnotations;
 
 namespace Accounting.Application.Services
 {

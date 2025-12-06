@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Accounting.Infrastructure.Repository
 {
-    public class JournalEntriesRepository : IJournalEntriesRepository
+    internal class JournalEntriesRepository : IJournalEntriesRepository
     {
         private readonly AccountingDbContext context;
 
