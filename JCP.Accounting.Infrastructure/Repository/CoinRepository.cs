@@ -1,4 +1,5 @@
-﻿using Accounting.Infrastructure.Interfaces;
+﻿using Accounting.Domain.DTO;
+using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,31 +19,32 @@ namespace Accounting.Infrastructure.Repository
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<List<Coin>> GetAllAsync()
+        public async Task<List<CoinDTO>> GetAllAsync()
         {
             List<Coin> retValue = await context.Coins.OrderBy(c => c.CoinId).ToListAsync();
-            return retValue;
+            return retValue.Select(c => Mappers.DtoMappers.MapCoinToDTO(c)).ToList();
         }
 
-        public async Task<Coin?> GetByIdAsync(short coinID)
+        public async Task<CoinDTO?> GetByIdAsync(short coinID)
         {
             Coin? retValue = await context.Coins.Where(c => c.CoinId == coinID).FirstOrDefaultAsync();
-            return retValue;
+            return retValue == null ? null : Mappers.DtoMappers.MapCoinToDTO(retValue);
         }
 
-        public async Task<List<Coin>> GetByFilterAsync(string name)
+        public async Task<List<CoinDTO>> GetByFilterAsync(string name)
         {
             List<Coin> retValue = await context.Coins
                                                .Where(c => c.Name.Contains(name))
                                                .OrderBy(c => c.Name)
                                                .ToListAsync();
-            return retValue;
+            return retValue.Select(c => Mappers.DtoMappers.MapCoinToDTO(c)).ToList();
         }
 
-        public async Task<short> AddAsync(Coin coin)
+        public async Task<short> AddAsync(CoinDTO coinDTO)
         {
             try
             {
+                Coin coin = Mappers.EntityMappers.MapToCoin(coinDTO);
                 context.Coins.Add(coin);
                 await context.SaveChangesAsync();
                 return coin.CoinId;
@@ -52,12 +54,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> UpdateAsync(Coin coin)
+        public async Task UpdateAsync(CoinDTO coinDTO)
         {
             try
             {
+                Coin coin = Mappers.EntityMappers.MapToCoin(coinDTO);
                 context.Coins.Update(coin);
-                return await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -65,13 +68,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> DeleteAsync(short coinID)
+        public async Task DeleteAsync(short coinID)
         {
             try
             {
-                return await context.Coins
-                              .Where(c => c.CoinId == coinID)
-                              .ExecuteDeleteAsync();
+                await context.Coins
+                             .Where(c => c.CoinId == coinID)
+                             .ExecuteDeleteAsync();
             }
             catch
             {

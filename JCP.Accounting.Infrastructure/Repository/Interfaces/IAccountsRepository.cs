@@ -1,19 +1,14 @@
-﻿using Accounting.Infrastructure.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Accounting.Domain.DTO;
 
 namespace Accounting.Infrastructure.Interfaces
 {
     public interface IAccountsRepository
     {
-        Task<List<Account>> GetAllAsync(int companyID, bool includeCoinInfo = false);
-        Task<Account?> GetByIDAsync(int companyID, string accountID, bool includeCoinInfo = false);
-        Task<List<Account>> GetByFilterAsync(int companyID, string data, bool includeCoinInfo = false);
-        Task<int> UpdateAsync(Account account);
-        Task<int> DeleteAsync(int companyID, string accountID);
-        Task AddAsync(Account account);
+        Task<List<AccountDTO>> GetAllAsync(int companyID, bool includeCoinInfo = false);
+        Task<AccountDTO?> GetByIDAsync(int companyID, string accountID, bool includeCoinInfo = false);
+        Task<List<AccountDTO>> GetByFilterAsync(int companyID, string data, bool includeCoinInfo = false);
+        Task AddAsync(AccountDTO accountDTO);
+        Task UpdateAsync(AccountDTO accountDTO);
+        Task DeleteAsync(int companyID, string accountID);
     }
 }

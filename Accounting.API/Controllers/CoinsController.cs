@@ -85,8 +85,8 @@ namespace Accounting.API.Controllers
         {
             try
             {
-                int rowsAffected = await coinsService.UpdateAsync(coinDTO);
-                return (rowsAffected == 0 ? NotFound() : Ok() );
+                coinsService.UpdateAsync(coinDTO);
+                return Ok();
             }
             catch (FormatException exception)
             {
@@ -132,8 +132,8 @@ namespace Accounting.API.Controllers
         {
             try
             {
-                int rowsAffected = await coinsService.DeleteAsync(coinID);
-                return (rowsAffected == 0 ? NotFound() : Ok() );
+                await coinsService.DeleteAsync(coinID);
+                return Ok();
             }
             catch (FormatException exception)
             {

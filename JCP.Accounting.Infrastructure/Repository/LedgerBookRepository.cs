@@ -1,5 +1,8 @@
-﻿using Accounting.Infrastructure.Interfaces;
+﻿using Accounting.Domain.DTO;
+using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
+using Accounting.Shared.Enums;
+using Accounting.Shared.Filters;
 
 namespace Accounting.Infrastructure.Repository
 {
@@ -7,25 +10,39 @@ namespace Accounting.Infrastructure.Repository
     {
         private readonly AccountingDbContext context;
         private readonly ITransactionsRepository transactionsRepository;
-        private readonly IJournalEntriesRepository journalEntriesRepository;
 
         public LedgerBookRepository(AccountingDbContext context)
         {
             this.context = context;
             this.transactionsRepository = new TransactionsRepository(context);
-            this.journalEntriesRepository = new JournalEntriesRepository(context);
         }
 
-        public async Task AddAsync(Transaction transaction, List<JournalEntry> journalEntries)
+        public async Task<TransactionDTO?> GetByIDAsync(long transactionID)
+        {
+            List<RelatedTransactionEntity> relatedTransactionEntities =
+                    new List<RelatedTransactionEntity> { RelatedTransactionEntity.JournalEntries };
+
+            TransactionDTO? retValue = await transactionsRepository.GetByIDAsync(transactionID, relatedTransactionEntities);
+            return retValue;
+        }
+
+        public async Task<List<TransactionDTO>> GetByFilterAsync(int companyID, TransactionsFilter filter)
+        {
+            List<RelatedTransactionEntity> relatedTransactionEntities =
+                    new List<RelatedTransactionEntity> { RelatedTransactionEntity.JournalEntries };
+            List<TransactionDTO> retValue = await transactionsRepository.GetByFilterAsync(companyID, filter);
+            return retValue;
+        }
+
+        public async Task<long> AddAsync(TransactionDTO transactionDTO)
         {
             using (var dbTransaction = context.Database.BeginTransaction())
             {
                 try
                 {
-                    long id = await transactionsRepository.AddAsync(transaction);
-                    journalEntries.ForEach(je => je.TransactionID = id);
-                    await journalEntriesRepository.AddAsync(journalEntries);
+                    long id = await transactionsRepository.AddAsync(transactionDTO);
                     dbTransaction.Commit();
+                    return id;
                 }
                 catch
                 {
@@ -35,28 +52,9 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task UpdateAsync(Transaction transaction, List<JournalEntry> journalEntries)
+        public async Task DeleteAsync(long transactionID, AuditTransactionDTO auditTransactionDTO)
         {
-            using (var dbTransaction = context.Database.BeginTransaction())
-            {
-                try
-                {
-                    long id = await transactionsRepository.UpdateAsync(transaction);
-                    journalEntries.ForEach(je => je.TransactionID = id);
-                    await journalEntriesRepository.AddAsync(journalEntries);
-                    dbTransaction.Commit();
-                }
-                catch
-                {
-                    dbTransaction.Rollback();
-                    throw;
-                }
-            }
-        }
-
-        public async Task DeleteAsync(Transaction transaction)
-        {
-            await transactionsRepository.DeleteAsync(transaction);
+            await transactionsRepository.DeleteAsync(transactionID, auditTransactionDTO);
         }
     }
 }

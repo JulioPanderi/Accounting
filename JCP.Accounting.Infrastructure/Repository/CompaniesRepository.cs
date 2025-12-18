@@ -1,6 +1,8 @@
-﻿using Accounting.Infrastructure.Interfaces;
+﻿using Accounting.Domain.DTO;
+using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace Accounting.Infrastructure.Repository
 {
@@ -13,50 +15,90 @@ namespace Accounting.Infrastructure.Repository
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<List<Company>> GetAllAsync()
+        public async Task<List<CompanyDTO>> GetAllAsync()
         {
-            List<Company> retValue = await context.Companies
-                                           .OrderBy(c => c.TradeName)
-                                           .Include(c => c.Country)
-                                           .ToListAsync();
+            List<CompanyDTO> retValue = await (from Company co in context.Companies
+                                               join Country c in context.Countries on co.CountryID equals c.CountryID
+                                               select new CompanyDTO
+                                               {
+                                                     CompanyID = co.CompanyID,
+                                                     LegalName = co.LegalName,
+                                                     TradeName = co.TradeName,
+                                                     Phone = co.Phone,
+                                                     Email = co.Email,
+                                                     Address = co.Address,
+                                                     City = co.City,
+                                                     State = co.State,
+                                                     ZipCode = co.ZipCode,
+                                                     CountryID = co.CountryID,
+                                                     CountryName = c.Name
+                                               }).ToListAsync();
             return retValue;
         }
 
-        public async Task<Company?> GetByIdAsync(int companyID)
+        public async Task<CompanyDTO?> GetByIdAsync(int companyID)
         {
-            Company? retValue = await context.Companies
-                                      .Where(c => c.CompanyID == companyID)
-                                      .Include(c => c.Country)
-                                      .FirstOrDefaultAsync();
+            CompanyDTO? retValue = await (from Company co in context.Companies
+                                          join Country c in context.Countries on co.CountryID equals c.CountryID
+                                          select new CompanyDTO
+                                          {
+                                                CompanyID = co.CompanyID,
+                                                LegalName = co.LegalName,
+                                                TradeName = co.TradeName,
+                                                Phone = co.Phone,
+                                                Email = co.Email,
+                                                Address = co.Address,
+                                                City = co.City,
+                                                State = co.State,
+                                                ZipCode = co.ZipCode,
+                                                CountryID = co.CountryID,
+                                                CountryName = c.Name
+                                          }).FirstOrDefaultAsync();
             return retValue;
         }
 
-        public async Task<List<Company>> GetByFilterAsync(string name)
+        public async Task<List<CompanyDTO>> GetByFilterAsync(string name)
         {
-            List<Company> retValue = await context.Companies
-                                                  .Where(c => c.TradeName.Contains(name))
-                                                  .Include(c => c.Country)
-                                                  .ToListAsync();
+            List<CompanyDTO> retValue = await (from Company co in context.Companies
+                                               join Country c in context.Countries on co.CountryID equals c.CountryID
+                                               where co.TradeName.Contains(name)
+                                               select new CompanyDTO
+                                               {
+                                                    CompanyID = co.CompanyID,
+                                                    LegalName = co.LegalName,
+                                                    TradeName = co.TradeName,
+                                                    Phone = co.Phone,
+                                                    Email = co.Email,
+                                                    Address = co.Address,
+                                                    City = co.City,
+                                                    State = co.State,
+                                                    ZipCode = co.ZipCode,
+                                                    CountryID = co.CountryID,
+                                                    CountryName = c.Name
+                                               }).ToListAsync();
             return retValue;
         }
 
-        public async Task AddAsync(Company company)
+        public async Task<int> AddAsync(CompanyDTO companyDTO)
         {
+            Company company = Mappers.EntityMappers.MapToCompany(companyDTO);
             context.Companies.Add(company);
+            await context.SaveChangesAsync();
+            return company.CompanyID;
+        }
+
+        public async Task UpdateAsync(CompanyDTO companyDTO)
+        {
+            Company company = Mappers.EntityMappers.MapToCompany(companyDTO);
+            context.Companies.Update(company);
             await context.SaveChangesAsync();
         }
 
-        public async Task<int> UpdateAsync(Company company)
+        public async Task DeleteAsync(int companyID)
         {
-            context.Companies.Update(company);
-            return await context.SaveChangesAsync();
-        }
-
-        public async Task<int> DeleteAsync(int companyID)
-        {
-            return await context.Companies
-                                .Where(c => c.CompanyID == companyID)
-                                .ExecuteDeleteAsync();
+            await context.Companies
+                         .Where(c => c.CompanyID == companyID)
+                         .ExecuteDeleteAsync();
         }
     }
 }

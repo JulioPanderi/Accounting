@@ -1,6 +1,5 @@
 ﻿using Accounting.Domain.DTO;
 using Accounting.Infrastructure.Interfaces;
-using Accounting.Infrastructure.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -22,57 +21,30 @@ namespace Accounting.Application.Services
 
         public async Task<List<CountryDTO>> GetAllAsync()
         {
-            List<CountryDTO> retValue = new List<CountryDTO>();
-            var countries = await countriesRepository.GetAllAsync();
-            if (countries != null)
-            {
-                retValue = (from c in countries select MapToDTO(c)).ToList();
-            }
+            List<CountryDTO> retValue = await countriesRepository.GetAllAsync();
             return retValue;
         }
 
         public async Task<CountryDTO?> GetByIdAsync(short countryID)
         {
-            Country? country = await countriesRepository.GetByIdAsync(countryID);
-            CountryDTO? retValue = (country == null) ? null : MapToDTO(country);
+            CountryDTO? retValue = await countriesRepository.GetByIdAsync(countryID);
             return retValue;
         }
 
-        public async Task<int> AddAsync(CountryDTO countryDTO)
+        public async Task<short> AddAsync(CountryDTO countryDTO)
         {
-            Country country = Map(countryDTO);
-            return await countriesRepository.AddAsync(country);
+            short retValue = await countriesRepository.AddAsync(countryDTO);
+            return retValue;
         }
 
-        public async Task<int> UpdateAsync(CountryDTO countryDTO)
+        public async Task UpdateAsync(CountryDTO countryDTO)
         {
-            Country country = Map(countryDTO);
-            return await countriesRepository.UpdateAsync(country);
+            await countriesRepository.UpdateAsync(countryDTO);
         }
 
-        public async Task<int> DeleteAsync(short countryID)
+        public async Task DeleteAsync(short countryID)
         {
-            return await countriesRepository.DeleteAsync(countryID);
-        }
-
-        internal static Country Map(CountryDTO countryDTO)
-        {
-            return new Country()
-            {
-                CountryID = countryDTO.CountryID,
-                Name = countryDTO.Name,
-                OfficialCoinID = countryDTO.OfficialCoinID
-            };
-        }
-
-        internal static CountryDTO MapToDTO(Country country)
-        {
-            return new CountryDTO()
-            {
-                CountryID = country.CountryID,
-                Name = country.Name,
-                OfficialCoinID = country.OfficialCoinID
-            };
+            await countriesRepository.DeleteAsync(countryID);
         }
 
         protected virtual void Dispose(bool disposing)

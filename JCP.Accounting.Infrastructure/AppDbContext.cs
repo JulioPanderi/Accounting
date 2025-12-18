@@ -24,6 +24,7 @@ namespace Accounting.Infrastructure
         public virtual DbSet<Transaction> Transactions { get; set; }
         public virtual DbSet<JournalEntry> JournalEntries { get; set; }
         public virtual DbSet<DocumentType> DocumentTypes { get; set; }
+        public virtual DbSet<AuditTransaction> AuditTransactions { get; set; }
         #endregion
     }
 }

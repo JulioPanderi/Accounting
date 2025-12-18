@@ -1,6 +1,5 @@
 ﻿using Accounting.Application.Interfaces;
 using Accounting.Domain.DTO;
-using Accounting.Infrastructure.Models;
 using Accounting.Infrastructure.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -23,72 +22,29 @@ namespace Accounting.Application.Services
 
         public async Task<List<AccountDTO>>GetAllAsync(int companyID)
         {
-            List<AccountDTO> retValue = new List<AccountDTO>();
-            var accounts = await accountsRepository.GetAllAsync(companyID);
-            if (accounts!= null)
-            {
-                retValue = (from a in accounts select MapToDTO(a)).ToList();
-            }
+            List<AccountDTO> retValue = await accountsRepository.GetAllAsync(companyID);
             return retValue;
         }
 
         public async Task<AccountDTO?> GetByIdAsync(int companyID, string accountID)
         {
-            AccountDTO? retValue = null;
-            var account = await accountsRepository.GetByIDAsync(companyID, accountID);
-            if (account != null)
-            {
-                retValue = MapToDTO(account);
-            }
+            AccountDTO? retValue = await accountsRepository.GetByIDAsync(companyID, accountID);
             return retValue;
         }
 
-        public async Task<int> UpdateAsync(AccountDTO accountDTO)
+        public async Task UpdateAsync(AccountDTO accountDTO)
         {
-            Account account = Map(accountDTO);
-            return await accountsRepository.UpdateAsync(account);
+            await accountsRepository.UpdateAsync(accountDTO);
         }
 
-        public async Task<int> DeleteAsync(int companyID, string accountID)
+        public async Task DeleteAsync(int companyID, string accountID)
         {
-            return await accountsRepository.DeleteAsync(companyID, accountID);
+            await accountsRepository.DeleteAsync(companyID, accountID);
         }
 
         public async Task AddAsync(AccountDTO accountDTO)
         {
-            Account account = Map(accountDTO);
-            await accountsRepository.AddAsync(account);
-        }
-
-        internal static Account Map(AccountDTO accountDTO)
-        {
-            Account retValue = new Account()
-            {
-                AccountID = accountDTO.AccountID,
-                CoinID = accountDTO.CoinID,
-                CompanyID = accountDTO.CompanyID,
-                Description = accountDTO.Description,
-                IsResultAccount = accountDTO.IsResultAccount,
-                IsClientAccount = accountDTO.IsClientAccount,
-                IsProviderAccount = accountDTO.IsProviderAccount,
-                IsCashAccount = accountDTO.IsCashAccount,
-                IsBankAccount = accountDTO.IsBankAccount
-            };
-            return retValue;
-        }
-
-        internal static AccountDTO MapToDTO(Account account)
-        {
-            AccountDTO retValue = new AccountDTO()
-            {
-                AccountID = account.AccountID,
-                CoinID = account.CoinID,
-                CompanyID = account.CompanyID,
-                Description = account.Description,
-                IsResultAccount = account.IsResultAccount,
-                Coin = (account.Coin == null ? null : CoinsService.MapToDTO(account.Coin))
-            };
-            return retValue;
+            await accountsRepository.AddAsync(accountDTO);
         }
 
         protected virtual void Dispose(bool disposing)

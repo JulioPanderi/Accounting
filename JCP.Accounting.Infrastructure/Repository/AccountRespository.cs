@@ -1,4 +1,5 @@
-﻿using Accounting.Infrastructure.Interfaces;
+﻿using Accounting.Domain.DTO;
+using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,7 @@ namespace Accounting.Infrastructure.Repository
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<List<Account>> GetAllAsync(int companyID, bool includeCoinInfo = false)
+        public async Task<List<AccountDTO>> GetAllAsync(int companyID, bool includeCoinInfo = false)
         {
             List<Account> retValue;
             IQueryable<Account> query = context.Accounts.Where(a => a.CompanyID == companyID);
@@ -25,10 +26,10 @@ namespace Accounting.Infrastructure.Repository
             {
                 retValue = await query.ToListAsync();
             }
-            return retValue;
+            return retValue.Select(a => Mappers.DtoMappers.MapAccountToDTO(a)).ToList();
         }
 
-        public async Task<List<Account>> GetByFilterAsync(int companyID, string data, bool includeCoinInfo = false)
+        public async Task<List<AccountDTO>> GetByFilterAsync(int companyID, string data, bool includeCoinInfo = false)
         {
             List<Account> retValue;
             IQueryable<Account> query = (from a in context.Accounts
@@ -44,23 +45,25 @@ namespace Accounting.Infrastructure.Repository
             {
                 retValue = await query.ToListAsync();
             }
-            return retValue;
+            return retValue.Select(a => Mappers.DtoMappers.MapAccountToDTO(a)).ToList();
         }
 
-        public async Task<Account?> GetByIDAsync(int companyID, string accountID, bool includeCoinInfo = false)
+        public async Task<AccountDTO?> GetByIDAsync(int companyID, string accountID, bool includeCoinInfo = false)
         {
-            var retValue = (from a in context.Accounts
-                            where a.AccountID == accountID
-                            select a);
+            var query = (from a in context.Accounts
+                           where a.AccountID == accountID
+                           select a);
             if (includeCoinInfo)
             {
-                retValue.Include(a => a.Coin);
+                query.Include(a => a.Coin);
             }
-            return await retValue.FirstOrDefaultAsync();
+            Account? account = await query.FirstOrDefaultAsync();
+            return (account == null) ? null : Mappers.DtoMappers.MapAccountToDTO(account);
         }
 
-        public async Task AddAsync(Account account)
+        public async Task AddAsync(AccountDTO accountDTO)
         {
+            Account account = Mappers.EntityMappers.MapToAccount(accountDTO);
             try
             {
                 await Task.Run(() =>
@@ -75,12 +78,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> UpdateAsync(Account account)
+        public async Task UpdateAsync(AccountDTO accountDTO)
         {
             try
             {
+                Account account = Mappers.EntityMappers.MapToAccount(accountDTO);
                 context.Accounts.Update(account);
-                return await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -88,13 +92,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> DeleteAsync(int companyID, string accountID)
+        public async Task DeleteAsync(int companyID, string accountID)
         {
             try
             {
-                return await context.Accounts
-                                    .Where(e => e.CompanyID == companyID && e.AccountID == accountID)
-                                    .ExecuteDeleteAsync();
+                await context.Accounts
+                             .Where(e => e.CompanyID == companyID && e.AccountID == accountID)
+                             .ExecuteDeleteAsync();
             }
             catch
             {

@@ -1,4 +1,5 @@
-﻿using Accounting.Infrastructure.Interfaces;
+﻿using Accounting.Domain.DTO;
+using Accounting.Infrastructure.Interfaces;
 using Accounting.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,31 +14,33 @@ namespace Accounting.Infrastructure.Repository
             this.context = context ?? throw new ArgumentNullException(nameof(context));
         }
 
-        public async Task<List<Country>> GetAllAsync()
+        public async Task<List<CountryDTO>> GetAllAsync()
         {
-            List<Country> retValue = await context.Countries.OrderBy(c => c.CountryID).ToListAsync();
-            return retValue;
+            List<Country> countries = await context.Countries.OrderBy(c => c.CountryID).ToListAsync();
+
+            return (countries?.Select(c => Mappers.DtoMappers.MapCountryToDTO(c)).ToList());
         }
 
-        public async Task<Country?> GetByIdAsync(int countryID)
+        public async Task<CountryDTO?> GetByIdAsync(int countryID)
         {
-            Country? retValue = await context.Countries.Where(c => c.CountryID == countryID).FirstOrDefaultAsync();
-            return retValue;
+            Country? country = await context.Countries.Where(c => c.CountryID == countryID).FirstOrDefaultAsync();
+            return (country == null ? null : Mappers.DtoMappers.MapCountryToDTO(country));
         }
 
-        public async Task<List<Country>> GetByFilterAsync(string name)
+        public async Task<List<CountryDTO>> GetByFilterAsync(string name)
         {
-            List<Country> retValue = await context.Countries
-                                               .Where(c => c.Name.Contains(name))
-                                               .OrderBy(c => c.Name)
-                                               .ToListAsync();
-            return retValue;
+            List<Country> countries = await context.Countries
+                                                   .Where(c => c.Name.Contains(name))
+                                                   .OrderBy(c => c.Name)
+                                                   .ToListAsync();
+            return (countries?.Select(c => Mappers.DtoMappers.MapCountryToDTO(c)).ToList());
         }
 
-        public async Task<int> AddAsync(Country country)
+        public async Task<short> AddAsync(CountryDTO countryDTO)
         {
             try
             {
+                Country country = Mappers.EntityMappers.MapToCountry(countryDTO);
                 context.Countries.Add(country);
                 await context.SaveChangesAsync();
                 return country.CountryID;
@@ -48,12 +51,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> UpdateAsync(Country country)
+        public async Task UpdateAsync(CountryDTO countryDTO)
         {
             try
             {
+                Country country = Mappers.EntityMappers.MapToCountry(countryDTO);
                 context.Countries.Update(country);
-                return await context.SaveChangesAsync();
+                await context.SaveChangesAsync();
             }
             catch
             {
@@ -61,13 +65,13 @@ namespace Accounting.Infrastructure.Repository
             }
         }
 
-        public async Task<int> DeleteAsync(int countryID)
+        public async Task DeleteAsync(int countryID)
         {
             try
             {
-                return await context.Countries
-                              .Where(c => c.CountryID == countryID)
-                              .ExecuteDeleteAsync();
+                await context.Countries
+                             .Where(c => c.CountryID == countryID)
+                             .ExecuteDeleteAsync();
             }
             catch
             {

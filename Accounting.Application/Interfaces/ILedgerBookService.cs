@@ -1,13 +1,12 @@
 ﻿using Accounting.Domain.DTO;
 using Accounting.Shared.Filters;
 
-namespace Accounting.Infrastructure.Interfaces
+namespace Accounting.Application.Interfaces
 {
-    public interface ILedgerBookRepository
+    public interface ILedgerBookService : IDisposable
     {
         Task<List<TransactionDTO>> GetByFilterAsync(int companyID, TransactionsFilter filter);
-        Task<TransactionDTO?> GetByIDAsync(long transactionID);
-        Task<long> AddAsync(TransactionDTO transactionDTO);
+        Task<long> AddAsync(TransactionDTO transaction);
         Task DeleteAsync(long transactionID, AuditTransactionDTO auditTransactionDTO);
     }
 }

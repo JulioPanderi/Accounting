@@ -6,8 +6,8 @@ namespace Accounting.Application.Interfaces
     {
         Task<List<AccountDTO>> GetAllAsync(int companyID);
         Task<AccountDTO?> GetByIdAsync(int companyID, string accountID);
-        Task<int> UpdateAsync(AccountDTO accountDTO);
-        Task<int> DeleteAsync(int companyID, string accountID);
+        Task UpdateAsync(AccountDTO accountDTO);
+        Task DeleteAsync(int companyID, string accountID);
         Task AddAsync(AccountDTO accountDTO);
     }
 }

@@ -1,19 +1,17 @@
-﻿using Accounting.Infrastructure.Filters;
+﻿using Accounting.Domain.DTO;
 using Accounting.Infrastructure.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Accounting.Shared.Enums;
+using Accounting.Shared.Filters;
 
 namespace Accounting.Infrastructure.Interfaces
 {
     public interface ITransactionsRepository
     {
-        Task<List<Transaction>> GetByFiltersAsync(int companyID, TransactionsFilter filter);
-        Task<Transaction?> GetByIDAsync(long transactionID);
-        Task<long> AddAsync(Transaction transaction);
-        Task<int> UpdateAsync(Transaction transaction);
-        Task<int> DeleteAsync(Transaction transaction);
+        IQueryable<Transaction> GetByFilter(int companyID, TransactionsFilter filter, List<RelatedTransactionEntity> includedEntities);
+        Task<List<TransactionDTO>> GetByFilterAsync(int companyID, TransactionsFilter filter, List<RelatedTransactionEntity>? relatedTransactionEntities = null);
+        Task<TransactionDTO?> GetByIDAsync(long transactionID, List<RelatedTransactionEntity>? relatedTransactionEntities = null);
+        Task<long> AddAsync(TransactionDTO transactionDTO);
+        Task UpdateAsync(TransactionDTO transactionDTO, AuditTransactionDTO auditTransactionDTO);
+        Task DeleteAsync(long transactionID, AuditTransactionDTO auditTransactionDTO);
     }
 }

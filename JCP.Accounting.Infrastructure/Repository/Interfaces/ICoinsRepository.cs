@@ -1,15 +1,14 @@
-﻿using Accounting.Infrastructure.Models;
-using System.Collections.Generic;
+﻿using Accounting.Domain.DTO;
 
 namespace Accounting.Infrastructure.Interfaces
 {
     public interface ICoinsRepository
     {
-        Task<List<Coin>> GetAllAsync();
-        Task<Coin?> GetByIdAsync(short coinID);
-        Task<List<Coin>> GetByFilterAsync(string name);
-        Task<short> AddAsync(Coin coin);
-        Task<int> UpdateAsync(Coin coin);
-        Task<int> DeleteAsync(short coinID);
+        Task<List<CoinDTO>> GetAllAsync();
+        Task<CoinDTO?> GetByIdAsync(short coinID);
+        Task<List<CoinDTO>> GetByFilterAsync(string name);
+        Task<short> AddAsync(CoinDTO coinDTO);
+        Task UpdateAsync(CoinDTO coinDTO);
+        Task DeleteAsync(short coinID);
     }
 }

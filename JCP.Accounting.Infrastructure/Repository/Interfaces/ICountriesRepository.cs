@@ -1,14 +1,14 @@
-﻿using Accounting.Infrastructure.Models;
+﻿using Accounting.Domain.DTO;
 
 namespace Accounting.Infrastructure.Interfaces
 {
     public interface ICountriesRepository
     {
-        Task<int> AddAsync(Country country);
-        Task<int> DeleteAsync(int countryID);
-        Task<List<Country>> GetAllAsync();
-        Task<List<Country>> GetByFilterAsync(string name);
-        Task<Country?> GetByIdAsync(int countryID);
-        Task<int> UpdateAsync(Country country);
+        Task<List<CountryDTO>> GetAllAsync();
+        Task<List<CountryDTO>> GetByFilterAsync(string name);
+        Task<CountryDTO?> GetByIdAsync(int countryID);
+        Task<short> AddAsync(CountryDTO countryDTO);
+        Task UpdateAsync(CountryDTO countryDTO);
+        Task DeleteAsync(int countryID);
     }
 }

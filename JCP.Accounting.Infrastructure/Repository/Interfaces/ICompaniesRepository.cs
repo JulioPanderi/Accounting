@@ -1,20 +1,14 @@
-﻿
-using Accounting.Infrastructure.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Accounting.Domain.DTO;
 
 namespace Accounting.Infrastructure.Interfaces
 {
     public interface ICompaniesRepository
     {
-        Task<List<Company>> GetAllAsync();
-        Task<Company?> GetByIdAsync(int companyID);
-        Task<List<Company>> GetByFilterAsync(string name);
-        Task<int> UpdateAsync(Company company);
-        Task<int> DeleteAsync(int companyID);
-        Task AddAsync(Company company);
+        Task<List<CompanyDTO>> GetAllAsync();
+        Task<CompanyDTO?> GetByIdAsync(int companyID);
+        Task<List<CompanyDTO>> GetByFilterAsync(string name);
+        Task UpdateAsync(CompanyDTO companyDTO);
+        Task DeleteAsync(int companyID);
+        Task<int> AddAsync(CompanyDTO companyDTO);
     }
 }

@@ -112,8 +112,8 @@ namespace Accounting.API.Controllers
         {
             try
             {
-                int rowsAffected = await companiesService.UpdateAsync(companyDTO);
-                return (rowsAffected == 0 ? NotFound() : Ok());
+                await companiesService.UpdateAsync(companyDTO);
+                return Ok();
             }
             catch (FormatException exception)
             {
@@ -159,8 +159,8 @@ namespace Accounting.API.Controllers
         {
             try
             {
-                int rowsAffected = await companiesService.DeleteAsync(companyID);
-                return (rowsAffected == 0 ? NotFound() : Ok());
+                await companiesService.DeleteAsync(companyID);
+                return Ok();
             }
             catch (FormatException exception)
             {
@@ -173,6 +173,5 @@ namespace Accounting.API.Controllers
                 return BadRequest(exception.Message);
             }
         }
-
     }
 }

@@ -7,8 +7,8 @@ namespace Accounting.Application.Interfaces
         Task<List<CompanyDTO>> GetAllAsync();
         Task<CompanyDTO?> GetByIdAsync(int companyID);
         Task<List<CompanyDTO>> GetByFilterAsync(string name);
-        Task<int> UpdateAsync(CompanyDTO companyDTO);
-        Task<int> DeleteAsync(int companyID);
-        Task AddAsync(CompanyDTO companyDTO);
+        Task<int> AddAsync(CompanyDTO companyDTO);
+        Task UpdateAsync(CompanyDTO companyDTO);
+        Task DeleteAsync(int companyID);
     }
 }
