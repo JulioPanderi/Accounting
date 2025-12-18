@@ -12,7 +12,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Accounting.Infrastructure.Repository
 {
-    public class TransactionsRepository : ITransactionsRepository
+    internal class TransactionsRepository : ITransactionsRepository
     {
         private readonly AccountingDbContext context;
         private readonly Dictionary<RelatedTransactionEntity, string> RelatedEntities;
